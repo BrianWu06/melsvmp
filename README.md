@@ -10,13 +10,20 @@
 The package “melsvmp” is an implementation of a Variational Message
 Passing algorithm for fitting Mixed-Effect Location-Scale model, which
 is defined as:
-$$ y_{ij} = x_{ij}^\top \beta + \nu_i + \varepsilon_{ij} $$
-$$ \nu_i \sim \mathcal{N}(0, \exp{(U_i^\top \alpha)}) $$
-$$ \varepsilon_{ij} \sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)}) $$
-$$ \omega_i \sim \mathcal{N}(0, \sigma_\omega^2) $$ For more
-information, please refer to Hedeker and Nordgren (2013). Note that our
-model formulation is a restricted to only allow for non time-varying
-covariates for $\alpha$ and without the effect of $\nu_i$ on $\omega_i$.
+
+``` math
+\begin{aligned}
+y_{ij} &= x_{ij}^\top \beta + \nu_i + \varepsilon_{ij} \\
+\nu_i &\sim \mathcal{N}(0, \exp{(U_i^\top \alpha)}) \\
+\varepsilon_{ij} &\sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)}) \\
+\omega_i &\sim \mathcal{N}(0, \sigma_\omega^2)
+\end{aligned}
+```
+
+For more information, please refer to Hedeker and Nordgren (2013). Note
+that our model formulation is a restricted to only allow for non
+time-varying covariates for $\alpha$ and without the effect of $\nu_i$
+on $\omega_i$.
 
 Some reviews of Variational Inference (VI) and Variational Message
 Passing (VMP) algorithms can be found in Blei, Kucukelbir, and McAuliffe
@@ -25,7 +32,11 @@ surrogate distributions $q(\theta)$ to approximate the posterior
 distribution $p(\theta \mid x)$ by minimizing the KL-divergence of these
 two distributions. While the KL-divergence is often intractable, we will
 instead optimize the Evidence Lower Bound (ELBO):
-$$ \mathrm{ELBO} = \mathbf{E}_q[\log p(\theta, x)] - \mathbf{E}_q[\log q(\theta)] $$
+
+``` math
+\mathrm{ELBO} = \mathbf{E}_q[\log p(\theta, x)] - \mathbf{E}_q[\log q(\theta)]
+```
+
 A common approach to make this approximation computationally efficient
 is to use the mean-field assumption, which assumes
 $q(\Theta) = q(\theta_1) \cdots q(\theta_m)$ for the set of all latent
@@ -98,7 +109,7 @@ summary(riesby_vmp)
 #> -------------------------------------------------------
 #> Convergence Details:
 #>   Algorithm converged in 55 iterations.
-#>   Total Runtime: 0.43 secs
+#>   Total Runtime: 0.4 secs
 ```
 
 For performing percentile bootstrap, you can use the following code, we
@@ -123,29 +134,29 @@ summary(riesby_vmp_boot)
 #> ## Bootstrap Summary for MELS Model ##
 #> --------------------------------------
 #> Successful replicates: 1000
-#> Total runtime: 3.05 mins
+#> Total runtime: 3.47 mins
 #> 
 #> --- Mean Model Parameters (beta) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)  22.2573  0.6544  21.1236  23.6098
-#> week         -2.2673  0.2970  -2.8761  -1.6811
-#> endog         1.8679  1.0233  -0.0576   3.7996
-#> endweek      -0.0139  0.4084  -0.8149   0.7543
+#> (Intercept)  22.2573  0.6638  20.9902  23.6405
+#> week         -2.2673  0.3164  -2.9014  -1.6663
+#> endog         1.8679  1.0288  -0.1943   3.8257
+#> endweek      -0.0139  0.4268  -0.8583   0.8545
 #> 
 #> --- Between-Subject Variance Parameters (alpha) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.2777  0.5556   1.0641   2.7838
-#> endog         0.4937  0.6104  -0.2508   1.6485
+#> (Intercept)   2.2777  0.5373   1.2321   2.7799
+#> endog         0.4937  0.5863  -0.2390   1.5850
 #> 
 #> --- Within-Subject Variance Parameters (tau) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.1381  0.2421   1.6064   2.5623
-#> week          0.1841  0.0588   0.0792   0.3047
-#> endog         0.2928  0.2534  -0.1944   0.8042
+#> (Intercept)   2.1381  0.2425   1.5929   2.5428
+#> week          0.1841  0.0612   0.0643   0.3087
+#> endog         0.2928  0.2534  -0.1637   0.7974
 #> 
 #> --- Random Effect Standard Deviation (omega) ---
 #>               Estimate Boot.SE CI.Lower CI.Upper
-#> omega_std_dev   0.6101    0.13   0.3669   0.8745
+#> omega_std_dev   0.6101  0.1377   0.3441   0.8749
 #> --------------------------------------
 ```
 
