@@ -49,6 +49,7 @@ summary(riesby_vmp)
 ```
 
 ```{r}
-riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, cores = 10)
+# riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, cores = 10)
+riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, parallel = FALSE)
 summary(riesby_vmp_boot)
 ```

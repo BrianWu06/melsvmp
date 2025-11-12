@@ -65,38 +65,45 @@ summary(riesby_vmp)
 ```
 
 ``` r
-riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, cores = 10)
-#> Starting PARALLEL bootstrap with 1000 replicates on 10 cores...
-#> Warning: All bootstrap replicates failed.
-#> Warning: All bootstrap replicates failed.
-#> Warning: All bootstrap replicates failed.
-#> Warning: All bootstrap replicates failed.
+# riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, cores = 10)
+riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, parallel = FALSE)
+#> Starting SEQUENTIAL bootstrap with 1000 replicates...
+#>   Running replicate: 100 of 1000
+#>   Running replicate: 200 of 1000
+#>   Running replicate: 300 of 1000
+#>   Running replicate: 400 of 1000
+#>   Running replicate: 500 of 1000
+#>   Running replicate: 600 of 1000
+#>   Running replicate: 700 of 1000
+#>   Running replicate: 800 of 1000
+#>   Running replicate: 900 of 1000
+#>   Running replicate: 1000 of 1000
 summary(riesby_vmp_boot)
 #> ## Bootstrap Summary for MELS Model ##
 #> --------------------------------------
-#> Successful replicates: 0
-#> Total runtime: 2.85 secs
+#> Successful replicates: 1000
+#> Total runtime: 2.09 mins
 #> 
 #> --- Mean Model Parameters (beta) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)  22.2573      NA       NA       NA
-#> week         -2.2673      NA       NA       NA
-#> endog         1.8679      NA       NA       NA
-#> endweek      -0.0139      NA       NA       NA
+#> (Intercept)  22.2573  0.6859  21.0114  23.6263
+#> week         -2.2673  0.3122  -2.9267  -1.7150
+#> endog         1.8679  1.0300  -0.1190   3.8602
+#> endweek      -0.0139  0.4231  -0.8161   0.7724
 #> 
 #> --- Between-Subject Variance Parameters (alpha) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.2777      NA       NA       NA
-#> endog         0.4937      NA       NA       NA
+#> (Intercept)   2.2777  0.4671   1.1963   2.7931
+#> endog         0.4937  0.5242  -0.2940   1.6136
 #> 
 #> --- Within-Subject Variance Parameters (tau) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.1381      NA       NA       NA
-#> week          0.1841      NA       NA       NA
-#> endog         0.2928      NA       NA       NA
+#> (Intercept)   2.1381  0.2439   1.6174   2.5498
+#> week          0.1841  0.0594   0.0759   0.3012
+#> endog         0.2928  0.2545  -0.1872   0.8016
 #> 
 #> --- Random Effect Standard Deviation (omega) ---
 #>               Estimate Boot.SE CI.Lower CI.Upper
-#> omega_std_dev   0.6101      NA       NA       NA
+#> omega_std_dev   0.6101  0.1372   0.3461   0.8824
 #> --------------------------------------
 ```
