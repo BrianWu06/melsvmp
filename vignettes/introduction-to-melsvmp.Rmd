@@ -1,0 +1,37 @@
+---
+title: "introduction-to-melsvmp"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{introduction-to-melsvmp}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(melsvmp)
+```
+
+```{r}
+data(riesby)
+
+riesby_vmp <- mels_vmp(y = "hamd", 
+                       beta_formula = ~ week + endog + endweek, 
+                       alpha_formula = ~ endog, 
+                       tau_formula = ~ week + endog, 
+                       id = "id",
+                       data = riesby)
+summary(riesby_vmp)
+```
+
+```{r, eval=FALSE}
+riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, cores = 10)
+summary(riesby_vmp_boot)
+```
+
