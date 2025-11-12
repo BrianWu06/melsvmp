@@ -14,37 +14,8 @@ The goal of melsvmp is to …
 You can install the development version of melsvmp like so:
 
 ``` r
-install.packages("devtools")
-#> Installing package into 'C:/Users/user/AppData/Local/Temp/RtmpSaIK2o/temp_libpath29747183190c'
-#> (as 'lib' is unspecified)
-#> package 'devtools' successfully unpacked and MD5 sums checked
-#> 
-#> The downloaded binary packages are in
-#>  C:\Users\user\AppData\Local\Temp\RtmpuIZy3c\downloaded_packages
-devtools::install_github("BrianWu06/melsvmp")
-#> Using GitHub PAT from the git credential store.
-#> Downloading GitHub repo BrianWu06/melsvmp@HEAD
-#> rbibutils  (2.3   -> 2.4  ) [CRAN]
-#> reformulas (0.4.1 -> 0.4.2) [CRAN]
-#> Installing 2 packages: rbibutils, reformulas
-#> Installing packages into 'C:/Users/user/AppData/Local/Temp/RtmpSaIK2o/temp_libpath29747183190c'
-#> (as 'lib' is unspecified)
-#> package 'rbibutils' successfully unpacked and MD5 sums checked
-#> package 'reformulas' successfully unpacked and MD5 sums checked
-#> 
-#> The downloaded binary packages are in
-#>  C:\Users\user\AppData\Local\Temp\RtmpuIZy3c\downloaded_packages
-#> ── R CMD build ─────────────────────────────────────────────────────────────────
-#>       ✔  checking for file 'C:\Users\user\AppData\Local\Temp\RtmpuIZy3c\remotes460c4c587dbf\BrianWu06-melsvmp-49efb55/DESCRIPTION'
-#>       ─  preparing 'melsvmp':
-#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
-#>       ─  checking for LF line-endings in source and make files and shell scripts
-#>   ─  checking for empty or unneeded directories
-#>       ─  building 'melsvmp_0.0.0.9000.tar.gz'
-#>      
-#> 
-#> Installing package into 'C:/Users/user/AppData/Local/Temp/RtmpSaIK2o/temp_libpath29747183190c'
-#> (as 'lib' is unspecified)
+# install.packages("devtools")
+# devtools::install_github("BrianWu06/melsvmp")
 ```
 
 ## Example
@@ -90,7 +61,7 @@ summary(riesby_vmp)
 #> -------------------------------------------------------
 #> Convergence Details:
 #>   Algorithm converged in 55 iterations.
-#>   Total Runtime: 0.15 secs
+#>   Total Runtime: 0.13 secs
 ```
 
 ``` r
@@ -104,7 +75,7 @@ summary(riesby_vmp_boot)
 #> ## Bootstrap Summary for MELS Model ##
 #> --------------------------------------
 #> Successful replicates: 0
-#> Total runtime: 2.98 secs
+#> Total runtime: 2.85 secs
 #> 
 #> --- Mean Model Parameters (beta) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
