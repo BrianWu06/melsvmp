@@ -10,12 +10,12 @@
 The package “melsvmp” is an implementation of a Variational Message
 Passing algorithm for fitting Mixed-Effect Location-Scale model, which
 is defined as: $$
-\begin{align}
+\begin{aligned}
   &y_{ij} = x_{ij}^\top \beta + \nu_i + \varepsilon_{ij} \label{eq:MELS_mean} \\
   &\nu_i \sim \mathcal{N}(0, \exp{(U_i^\top \alpha)}) \\
   &\varepsilon_{ij} \sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)}) \\
   &\omega_i \sim \mathcal{N}(0, \sigma_\omega^2)
-\end{align}
+\end{aligned}
 $$ For more information, please refer to Hedeker and Nordgren (2013).
 Note that our model formulation is a restricted to only allow for non
 time-varying covariates for $\alpha$ and without the effect of $\nu_i$
@@ -27,10 +27,10 @@ Passing (VMP) algorithms can be found in Blei, Kucukelbir, and McAuliffe
 surrogate distributions $q(\theta)$ to approximate the posterior
 distribution $p(\theta \mid x)$ by minimizing the KL-divergence of these
 two distributions. While the KL-divergence is often intractable, we will
-instead optimize the Evidence Lower Bound (ELBO): $$
-\text{ELBO} &= \mathbb{E}_q[\log p(\theta, x)] - \mathbb{E}_q[\log q(\theta)]
-$$ A common approach to make this approximation computationally
-efficient is to use the mean-field assumption, which assumes
+instead optimize the Evidence Lower Bound (ELBO):
+$$ \mathrm{ELBO} = \mathbb{E}_q[\log p(\theta, x)] - \mathbb{E}_q[\log q(\theta)] $$
+A common approach to make this approximation computationally efficient
+is to use the mean-field assumption, which assumes
 $q(\Theta) = q(\theta_1) \cdots q(\theta_m)$ for the set of all latent
 variables $\Theta = \{ \theta_1, \dots, \theta_m \}$. Under this
 assumption, we can get clean update equations for conjugate variables
@@ -101,7 +101,7 @@ summary(riesby_vmp)
 #> -------------------------------------------------------
 #> Convergence Details:
 #>   Algorithm converged in 55 iterations.
-#>   Total Runtime: 0.16 secs
+#>   Total Runtime: 0.15 secs
 ```
 
 For performing percentile bootstrap, you can use the following code, we
@@ -126,29 +126,29 @@ summary(riesby_vmp_boot)
 #> ## Bootstrap Summary for MELS Model ##
 #> --------------------------------------
 #> Successful replicates: 1000
-#> Total runtime: 2.2 mins
+#> Total runtime: 2.84 mins
 #> 
 #> --- Mean Model Parameters (beta) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)  22.2573  0.6468  21.0785  23.6401
-#> week         -2.2673  0.3036  -2.8858  -1.6688
-#> endog         1.8679  1.0459  -0.0187   3.9580
-#> endweek      -0.0139  0.4403  -0.8522   0.8672
+#> (Intercept)  22.2573  0.6605  21.0709  23.6033
+#> week         -2.2673  0.3042  -2.8911  -1.6761
+#> endog         1.8679  1.0194  -0.1346   3.8194
+#> endweek      -0.0139  0.4328  -0.8464   0.8834
 #> 
 #> --- Between-Subject Variance Parameters (alpha) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.2777  0.4104   1.1319   2.7468
-#> endog         0.4937  0.4758  -0.1831   1.6525
+#> (Intercept)   2.2777  0.5296   1.1474   2.7801
+#> endog         0.4937  0.5744  -0.2168   1.5691
 #> 
 #> --- Within-Subject Variance Parameters (tau) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.1381  0.2456   1.6132   2.5542
-#> week          0.1841  0.0596   0.0683   0.3038
-#> endog         0.2928  0.2585  -0.2210   0.8015
+#> (Intercept)   2.1381  0.2432   1.6136   2.5623
+#> week          0.1841  0.0608   0.0621   0.3009
+#> endog         0.2928  0.2616  -0.2382   0.8115
 #> 
 #> --- Random Effect Standard Deviation (omega) ---
 #>               Estimate Boot.SE CI.Lower CI.Upper
-#> omega_std_dev   0.6101  0.1298   0.3516    0.875
+#> omega_std_dev   0.6101   0.135   0.3732   0.8947
 #> --------------------------------------
 ```
 
