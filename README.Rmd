@@ -24,9 +24,10 @@ The goal of melsvmp is to ...
 
 You can install the development version of melsvmp like so:
 
-``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+```{r}
+
 ```
+
 
 ## Example
 
@@ -34,21 +35,21 @@ This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
 library(melsvmp)
-## basic example code
+
+riesby <- read.table("RIESBY.DAT.txt", na.strings = ".", 
+                     col.names = c("id", "hamd", "intcpt", "week", "endog", "endweek"))
+
+riesby_ncvmp <- mels_ncvmp(y = "hamd", 
+                           beta_formula = ~ week + endog + endweek, 
+                           alpha_formula = ~ endog, 
+                           tau_formula = ~ week + endog, 
+                           id = "id",
+                           data = riesby)
+summary(riesby_ncvmp)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
+```{r}
+riesby_ncvmp_boot <- bootstrap_mels_ncvmp(riesby_ncvmp, B = 1000, cores = 10)
+summary(riesby_ncvmp_boot)
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
