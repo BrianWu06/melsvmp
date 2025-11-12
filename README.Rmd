@@ -25,7 +25,8 @@ The goal of melsvmp is to ...
 You can install the development version of melsvmp like so:
 
 ```{r}
-
+install.packages("devtools")
+devtools::install_github("BrianWu06/melsvmp")
 ```
 
 
@@ -36,20 +37,19 @@ This is a basic example which shows you how to solve a common problem:
 ```{r example}
 library(melsvmp)
 
-riesby <- read.table("RIESBY.DAT.txt", na.strings = ".", 
-                     col.names = c("id", "hamd", "intcpt", "week", "endog", "endweek"))
+data(riesby)
 
-riesby_ncvmp <- mels_ncvmp(y = "hamd", 
-                           beta_formula = ~ week + endog + endweek, 
-                           alpha_formula = ~ endog, 
-                           tau_formula = ~ week + endog, 
-                           id = "id",
-                           data = riesby)
-summary(riesby_ncvmp)
+riesby_vmp <- mels_vmp(y = "hamd", 
+                       beta_formula = ~ week + endog + endweek, 
+                       alpha_formula = ~ endog, 
+                       tau_formula = ~ week + endog, 
+                       id = "id",
+                       data = riesby)
+summary(riesby_vmp)
 ```
 
 ```{r}
-riesby_ncvmp_boot <- bootstrap_mels_ncvmp(riesby_ncvmp, B = 1000, cores = 10)
-summary(riesby_ncvmp_boot)
+riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, cores = 10)
+summary(riesby_vmp_boot)
 ```
 
