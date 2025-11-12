@@ -7,7 +7,35 @@
 
 <!-- badges: end -->
 
-The goal of melsvmp is to …
+The package “melsvmp” is an implementation of a Variational Message
+Passing algorithm for fitting Mixed-Effect Location-Scale model, which
+is defined as: $$
+\begin{align}
+  &y_{ij} = x_{ij}^\top \beta + \nu_i + \varepsilon_{ij} \label{eq:MELS_mean} \\
+  &\nu_i \sim \mathcal{N}(0, \exp{(U_i^\top \alpha)}) \\
+  &\varepsilon_{ij} \sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)}) \\
+  &\omega_i \sim \mathcal{N}(0, \sigma_\omega^2)
+\end{align}
+$$ For more information, please refer to Hedeker and Nordgren (2013).
+Note that our model formulation is a restricted to only allow for non
+time-varying covariates for $\alpha$ and without the effect of $\nu_i$
+on $\omega_i$.
+
+Some reviews of Variational Inference (VI) and Variational Message
+Passing (VMP) algorithms can be found in Blei, Kucukelbir, and McAuliffe
+(2017) and Ormerod and Wand (2010). Briefly speaking, VI introduces
+surrogate distributions $q(\theta)$ to approximate the posterior
+distribution $p(\theta \mid x)$ by minimizing the KL-divergence of these
+two distributions. While the KL-divergence is often intractable, we will
+instead optimize the Evidence Lower Bound (ELBO): $$
+\text{ELBO} &= \mathbb{E}_q[\log p(\theta, x)] - \mathbb{E}_q[\log q(\theta)]
+$$ A common approach to make this approximation computationally
+efficient is to use the mean-field assumption, which assumes
+$q(\Theta) = q(\theta_1) \cdots q(\theta_m)$ for the set of all latent
+variables $\Theta = \{ \theta_1, \dots, \theta_m \}$. Under this
+assumption, we can get clean update equations for conjugate variables
+(Blei, Kucukelbir, and McAuliffe (2017)) and non-conjugate ones using
+Laplace approximation (Wand (2014)).
 
 ## Installation
 
@@ -20,13 +48,25 @@ You can install the development version of melsvmp like so:
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example showing how to use the function mels_vmp to fit
+a MELS model by an example. We use a simple longitudinal dataset
+“riesby” to illustrate the usage, you can import and view the
+description of this dataset by
 
 ``` r
 library(melsvmp)
 
 data(riesby)
 
+?riesby
+```
+
+The following code shows how to fit a MELS model with our vmp algorithm
+on the riesby dataset. The standard errors and confidence intervals are
+estimated by the sandwich estimators proposed by Westling and McCormick
+(2019).
+
+``` r
 riesby_vmp <- mels_vmp(y = "hamd", 
                        beta_formula = ~ week + endog + endweek, 
                        alpha_formula = ~ endog, 
@@ -61,8 +101,12 @@ summary(riesby_vmp)
 #> -------------------------------------------------------
 #> Convergence Details:
 #>   Algorithm converged in 55 iterations.
-#>   Total Runtime: 0.13 secs
+#>   Total Runtime: 0.16 secs
 ```
+
+For performing percentile bootstrap, you can use the following code, we
+support both parallel and sequential computing. This can give a more
+robust confidence interval.
 
 ``` r
 # riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, cores = 10)
@@ -82,28 +126,74 @@ summary(riesby_vmp_boot)
 #> ## Bootstrap Summary for MELS Model ##
 #> --------------------------------------
 #> Successful replicates: 1000
-#> Total runtime: 2.09 mins
+#> Total runtime: 2.2 mins
 #> 
 #> --- Mean Model Parameters (beta) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)  22.2573  0.6859  21.0114  23.6263
-#> week         -2.2673  0.3122  -2.9267  -1.7150
-#> endog         1.8679  1.0300  -0.1190   3.8602
-#> endweek      -0.0139  0.4231  -0.8161   0.7724
+#> (Intercept)  22.2573  0.6468  21.0785  23.6401
+#> week         -2.2673  0.3036  -2.8858  -1.6688
+#> endog         1.8679  1.0459  -0.0187   3.9580
+#> endweek      -0.0139  0.4403  -0.8522   0.8672
 #> 
 #> --- Between-Subject Variance Parameters (alpha) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.2777  0.4671   1.1963   2.7931
-#> endog         0.4937  0.5242  -0.2940   1.6136
+#> (Intercept)   2.2777  0.4104   1.1319   2.7468
+#> endog         0.4937  0.4758  -0.1831   1.6525
 #> 
 #> --- Within-Subject Variance Parameters (tau) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.1381  0.2439   1.6174   2.5498
-#> week          0.1841  0.0594   0.0759   0.3012
-#> endog         0.2928  0.2545  -0.1872   0.8016
+#> (Intercept)   2.1381  0.2456   1.6132   2.5542
+#> week          0.1841  0.0596   0.0683   0.3038
+#> endog         0.2928  0.2585  -0.2210   0.8015
 #> 
 #> --- Random Effect Standard Deviation (omega) ---
 #>               Estimate Boot.SE CI.Lower CI.Upper
-#> omega_std_dev   0.6101  0.1372   0.3461   0.8824
+#> omega_std_dev   0.6101  0.1298   0.3516    0.875
 #> --------------------------------------
 ```
+
+## References
+
+<div id="refs" class="references csl-bib-body hanging-indent"
+entry-spacing="0">
+
+<div id="ref-blei2017variational" class="csl-entry">
+
+Blei, David M, Alp Kucukelbir, and Jon D McAuliffe. 2017. “Variational
+Inference: A Review for Statisticians.” *Journal of the American
+Statistical Association* 112 (518): 859–77.
+
+</div>
+
+<div id="ref-hedeker2013mixregls" class="csl-entry">
+
+Hedeker, Donald, and Rachel Nordgren. 2013. “MIXREGLS: A Program for
+Mixed-Effects Location Scale Analysis.” *Journal of Statistical
+Software* 52: 1–38.
+
+</div>
+
+<div id="ref-ormerod2010explaining" class="csl-entry">
+
+Ormerod, John T, and Matt P Wand. 2010. “Explaining Variational
+Approximations.” *The American Statistician* 64 (2): 140–53.
+
+</div>
+
+<div id="ref-wand2014fully" class="csl-entry">
+
+Wand, Matt P. 2014. “Fully Simplified Multivariate Normal Updates in
+Non-Conjugate Variational Message Passing.” *Journal of Machine Learning
+Research*.
+
+</div>
+
+<div id="ref-westling2019beyond" class="csl-entry">
+
+Westling, T, and TH McCormick. 2019. “Beyond Prediction: A Framework for
+Inference with Variational Approximations in Mixture Models.” *Journal
+of Computational and Graphical Statistics* 28 (4): 778–89.
+
+</div>
+
+</div>
