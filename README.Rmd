@@ -20,19 +20,15 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 The package "melsvmp" is an implementation of a Variational Message Passing algorithm for fitting Mixed-Effect Location-Scale model, which is defined as: 
-$$
-\begin{aligned}
-  &y_{ij} = x_{ij}^\top \beta + \nu_i + \varepsilon_{ij} \label{eq:MELS_mean} \\
-  &\nu_i \sim \mathcal{N}(0, \exp{(U_i^\top \alpha)}) \\
-  &\varepsilon_{ij} \sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)}) \\
-  &\omega_i \sim \mathcal{N}(0, \sigma_\omega^2)
-\end{aligned}
-$$
+$$ y_{ij} = x_{ij}^\top \beta + \nu_i + \varepsilon_{ij} $$
+$$ \nu_i \sim \mathcal{N}(0, \exp{(U_i^\top \alpha)}) $$
+$$ \varepsilon_{ij} \sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)}) $$
+$$ \omega_i \sim \mathcal{N}(0, \sigma_\omega^2) $$
 For more information, please refer to @hedeker2013mixregls. Note that our model formulation is a restricted to only allow for non time-varying covariates for $\alpha$ and without the effect of $\nu_i$ on $\omega_i$.
 
 Some reviews of Variational Inference (VI) and Variational Message Passing (VMP) algorithms can be found in @blei2017variational and @ormerod2010explaining.
 Briefly speaking, VI introduces surrogate distributions $q(\theta)$ to approximate the posterior distribution $p(\theta \mid x)$ by minimizing the KL-divergence of these two distributions. While the KL-divergence is often intractable, we will instead optimize the Evidence Lower Bound (ELBO): 
-$$ \mathrm{ELBO} = \mathbb{E}_q[\log p(\theta, x)] - \mathbb{E}_q[\log q(\theta)] $$
+$$ \mathrm{ELBO} = \mathbf{E}_q[\log p(\theta, x)] - \mathbf{E}_q[\log q(\theta)] $$
 A common approach to make this approximation computationally efficient is to use the mean-field assumption, which assumes $q(\Theta) = q(\theta_1) \cdots q(\theta_m)$ for the set of all latent variables $\Theta = \{ \theta_1, \dots, \theta_m \}$. 
 Under this assumption, we can get clean update equations for conjugate variables (@blei2017variational) and non-conjugate ones using Laplace approximation (@wand2014fully). 
 
