@@ -2,7 +2,7 @@
 % Please edit documentation in R/melsvmp.R
 \name{mels_vmp}
 \alias{mels_vmp}
-\title{Fit a Mixed-Effects Location Scale Model}
+\title{Using a Variational Message Passing (VMP) algorithm to fit a Mixed-Effects Location Scale Model.}
 \usage{
 mels_vmp(y, beta_formula, alpha_formula, tau_formula, id, data, ...)
 }
@@ -25,5 +25,33 @@ mels_vmp(y, beta_formula, alpha_formula, tau_formula, id, data, ...)
 An object of class 'mels_vmp'.
 }
 \description{
-Uses a Variational Message Passing (VMP) algorithm.
+Using a Variational Message Passing (VMP) algorithm to fit a Mixed-Effects Location Scale Model.
+}
+\details{
+This function fits a mixed-effects model with structured variances.
+The model is defined as:
+
+\deqn{y_{ij} = x_{ij}^\top \beta + \nu_i + \varepsilon_{ij}}
+\deqn{\nu_i \sim \mathcal{N}(0, \exp{(U_i^\top \alpha)})}
+\deqn{\varepsilon_{ij} \sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)})}
+\deqn{\omega_i \sim \mathcal{N}(0, \sigma_\omega^2)}
+
+Where \eqn{\beta} and \eqn{\alpha} are fixed effects for the mean and
+between-subject variance, and \eqn{\tau} are fixed effects for the
+within-subject variance.
+}
+\examples{
+data(riesby, package = "melsvmp")
+  
+riesby_vmp <- mels_vmp(y = "hamd", 
+                         beta_formula = ~ week + endog + endweek, 
+                         alpha_formula = ~ endog, 
+                         tau_formula = ~ week + endog, 
+                         id = "id",
+                         data = riesby)
+  
+summary(riesby_vmp)
+}
+\seealso{
+\code{\link{summary.mels_vmp}}, \code{\link{bootstrap_mels_vmp}}
 }

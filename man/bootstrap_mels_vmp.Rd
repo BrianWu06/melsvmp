@@ -2,7 +2,7 @@
 % Please edit documentation in R/melsvmp.R
 \name{bootstrap_mels_vmp}
 \alias{bootstrap_mels_vmp}
-\title{Bootstrap method for mels_vmp objects}
+\title{Non-parametric Bootstrap for mels_vmp Models}
 \usage{
 bootstrap_mels_vmp(model_object, B = 1000, parallel = TRUE, cores = 5, ...)
 }
@@ -11,12 +11,33 @@ bootstrap_mels_vmp(model_object, B = 1000, parallel = TRUE, cores = 5, ...)
 
 \item{B}{Number of bootstrap replicates.}
 
-\item{parallel}{Logical, whether to run in parallel. (ADD THIS)}
+\item{parallel}{Logical. If \code{TRUE} (the default), run in parallel.}
 
-\item{cores}{Number of cores for parallel execution. (ADD THIS)}
+\item{cores}{Number of cores to use for parallel execution.}
 
-\item{...}{Other arguments. (This line is fine)}
+\item{...}{Additional arguments (currently unused).}
+}
+\value{
+An object of class \code{mels_vmp_bootstrap}. This is a list containing:
+\itemize{
+\item \code{beta}: A list with original estimates, bootstrap SE, and percentile CIs.
+\item \code{alpha}: A list with original estimates, bootstrap SE, and percentile CIs.
+\item \code{tau}: A list with original estimates, bootstrap SE, and percentile CIs.
+\item \code{omega}: A list with original estimates, bootstrap SE, and percentile CIs.
+\item \code{n_reps}: The number of successful replicates.
+\item \code{runtime}: The total runtime.
+}
 }
 \description{
-Bootstrap method for mels_vmp objects
+Performs a non-parametric bootstrap (resampling subjects with replacement)
+to estimate standard errors and confidence intervals for a mels_vmp model.
+}
+\details{
+This function implements a non-parametric bootstrap by resampling subjects
+(as defined by the \code{id} variable) with replacement. For each of the \code{B}
+replicates, it refits the \code{mels_vmp} model on the resampled data.
+It can be run in parallel by setting \code{parallel = TRUE}.
+}
+\seealso{
+\code{\link{mels_vmp}}, \code{\link{summary.mels_vmp_bootstrap}}
 }

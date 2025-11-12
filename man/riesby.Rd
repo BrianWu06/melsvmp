@@ -3,10 +3,9 @@
 \docType{data}
 \name{riesby}
 \alias{riesby}
-\title{Riesby Data Set
-...}
+\title{Riesby Data Set}
 \format{
-A data frame with X rows and 6 variables:
+A data frame with 396 rows and 6 variables:
 \describe{
 \item{id}{Subject ID}
 \item{hamd}{Hamilton depression score}
@@ -20,7 +19,14 @@ A data frame with X rows and 6 variables:
 riesby
 }
 \description{
-Riesby Data Set
-...
+A longitudinal dataset that examined the Hamilton depression plasma scores and
+clinical response
+}
+\details{
+66 depressed inpatients (37 endogenous and 29 non-endogenous) with 396 total
+observations.
+}
+\references{
+Reisby, Niels, et al. "Imipramine: clinical effects and pharmacokinetic variability." Psychopharmacology 54.3 (1977): 263-272.
 }
 \keyword{datasets}

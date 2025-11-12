@@ -510,9 +510,30 @@ mels_vmp_fitter <- function(X_matrix, y_vector, w_matrix, u_matrix, ids, max_ite
   return(results)
 }
 
-#' Fit a Mixed-Effects Location Scale Model
+
+#' Using a Variational Message Passing (VMP) algorithm to fit a Mixed-Effects Location Scale Model.
+#' 
+#' @details
+#' This function fits a mixed-effects model with structured variances.
+#' The model is defined as:
+#' 
+#' \deqn{y_{ij} = x_{ij}^\top \beta + \nu_i + \varepsilon_{ij}}
+#' \deqn{\nu_i \sim \mathcal{N}(0, \exp{(U_i^\top \alpha)})}
+#' \deqn{\varepsilon_{ij} \sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)})}
+#' \deqn{\omega_i \sim \mathcal{N}(0, \sigma_\omega^2)}
+#' 
+#' Where \eqn{\beta} and \eqn{\alpha} are fixed effects for the mean and
+#' between-subject variance, and \eqn{\tau} are fixed effects for the 
+#' within-subject variance.
 #'
-#' Uses a Variational Message Passing (VMP) algorithm.
+#' @param y The name of the response variable in 'data'.
+#' @param beta_formula A formula for the mean model (fixed effects).
+#' @param alpha_formula A formula for the between-subject variance.
+#' @param tau_formula A formula for the within-subject variance.
+#' @param id The name of the subject ID variable in 'data'.
+#' @param data A data.frame containing all variables.
+#' @param ... Additional arguments passed to the fitter function (e.g., 
+#'   `max_iter`, `tol`).
 #'
 #' @param y The name of the response variable in 'data'.
 #' @param beta_formula A formula for the mean model (fixed effects).
@@ -523,7 +544,11 @@ mels_vmp_fitter <- function(X_matrix, y_vector, w_matrix, u_matrix, ids, max_ite
 #' @param ... Additional arguments passed to the fitter function.
 #'
 #' @return An object of class 'mels_vmp'.
-#' @export
+#' 
+#' @seealso \code{\link{summary.mels_vmp}}, \code{\link{bootstrap_mels_vmp}}
+#' 
+#' @export 
+#' @example /examples/mels_vmp_example.R
 #' @importFrom lme4 lmer fixef ranef
 #' @importFrom stats as.formula coef lm model.matrix na.omit pnorm residuals vcov
 #'
@@ -555,13 +580,32 @@ mels_vmp <- function(y, beta_formula, alpha_formula, tau_formula, id, data, ...)
   return(results)
 }
 
-#' Summary method for mels_vmp objects
+#' Summarize a mels_vmp Model Fit
 #'
-#' Provides a summary of the fitted model with robust sandwich errors.
+#' Prints a formatted summary of a fitted Mixed-Effects Location Scale model,
+#' including parameter estimates, robust sandwich standard errors, z-values,
+#' and p-values.
 #'
-#' @param object An object of class 'mels_vmp'.
-#' @param ... Additional arguments
-#' @export
+#' @details
+#' The summary is organized into sections:
+#' \itemize{
+#'   \item \strong{Mean Model Parameters (beta):} Estimates for the fixed effects in the mean model.
+#'   \item \strong{Between-Subject Variance Parameters (alpha):} Estimates for the fixed effects in the between-subject variance model.
+#'   \item \strong{Within-Subject Variance Parameters (tau):} Estimates for the fixed effects in the within-subject variance model.
+#'   \item \strong{Random Effect Standard Deviation (omega):} Estimate for the random effect standard deviation.
+#'   \item \strong{Convergence Details:} Number of iterations and total runtime.
+#' }
+#' All standard errors and confidence intervals are based on the robust 
+#' sandwich estimator.
+#'
+#' @param object An object of class `mels_vmp`.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return
+#' Invisibly returns the original `mels_vmp` object.
+#'
+#' @seealso \code{\link{mels_vmp}}
+#' @exportS3Method summary mels_vmp
 #'
 summary.mels_vmp <- function(object, ...){
   cat("## VMP for MELS (with Robust Sandwich Errors) ##\n")
@@ -641,13 +685,36 @@ summary.mels_vmp <- function(object, ...){
   invisible(object)
 }
 
-#' Bootstrap method for mels_vmp objects
+#' Non-parametric Bootstrap for mels_vmp Models
+#'
+#' Performs a non-parametric bootstrap (resampling subjects with replacement)
+#' to estimate standard errors and confidence intervals for a mels_vmp model.
+#'
+#' @details
+#' This function implements a non-parametric bootstrap by resampling subjects
+#' (as defined by the `id` variable) with replacement. For each of the `B`
+#' replicates, it refits the `mels_vmp` model on the resampled data.
+#' It can be run in parallel by setting `parallel = TRUE`.
 #'
 #' @param model_object An object of class 'mels_vmp'.
 #' @param B Number of bootstrap replicates.
-#' @param parallel Logical, whether to run in parallel. (ADD THIS)
-#' @param cores Number of cores for parallel execution. (ADD THIS)
-#' @param ... Other arguments. (This line is fine)
+#' @param parallel Logical. If `TRUE` (the default), run in parallel.
+#' @param cores Number of cores to use for parallel execution.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return
+#' An object of class `mels_vmp_bootstrap`. This is a list containing:
+#' \itemize{
+#'   \item `beta`: A list with original estimates, bootstrap SE, and percentile CIs.
+#'   \item `alpha`: A list with original estimates, bootstrap SE, and percentile CIs.
+#'   \item `tau`: A list with original estimates, bootstrap SE, and percentile CIs.
+#'   \item `omega`: A list with original estimates, bootstrap SE, and percentile CIs.
+#'   \item `n_reps`: The number of successful replicates.
+#'   \item `runtime`: The total runtime.
+#' }
+#'
+#' @seealso \code{\link{mels_vmp}}, \code{\link{summary.mels_vmp_bootstrap}}
+#'
 #'
 #' @export
 #' @importFrom dplyr left_join
@@ -655,6 +722,7 @@ summary.mels_vmp <- function(object, ...){
 #' @importFrom doParallel registerDoParallel
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom stats sd quantile
+#'
 bootstrap_mels_vmp <- function(model_object, B = 1000, 
                                parallel = TRUE, cores = 5, ...) {
   
@@ -767,13 +835,29 @@ bootstrap_mels_vmp <- function(model_object, B = 1000,
   return(output)
 }
 
-#' Summary method for mels_vmp_bootstrap objects
+#' Summarize a mels_vmp Bootstrap
 #'
-#' Provides a summary of the bootstrap results.
+#' Prints a formatted summary of the non-parametric bootstrap results,
+#' including the original estimates, bootstrap standard errors, and
+#' 95% percentile confidence intervals.
 #'
-#' @param object An object of class 'mels_vmp_bootstrap'.
+#' @details
+#' The summary is printed to the console and organized into sections:
+#' \itemize{
+#'   \item Header: Reports the number of successful replicates and total runtime.
+#'   \item Mean Model Parameters (beta): Estimates, Bootstrap SE, and CIs.
+#'   \item Between-Subject Variance Parameters (alpha): Estimates, Bootstrap SE, and CIs.
+#'   \item Within-Subject Variance Parameters (tau): Estimates, Bootstrap SE, and CIs.
+#'   \item Random Effect Standard Deviation (omega): Estimates, Bootstrap SE, and CIs.
+#' }
+#'
+#' @param object An object of class `mels_vmp_bootstrap`.
 #' @param ... Additional arguments (currently unused).
 #'
+#' @return
+#' Invisibly returns the original `mels_vmp_bootstrap` object.
+#'
+#' @seealso \code{\link{bootstrap_mels_vmp}}
 #' @exportS3Method summary mels_vmp_bootstrap
 #'
 summary.mels_vmp_bootstrap <- function(object, ...) {

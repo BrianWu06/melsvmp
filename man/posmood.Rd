@@ -5,7 +5,7 @@
 \alias{posmood}
 \title{Positive Mood Data Set}
 \format{
-A data frame with X rows and Y variables:
+A data frame with 17574 rows and 19 variables:
 \describe{
 \item{id}{Subject ID}
 \item{posmood}{Positive mood score}
@@ -32,6 +32,13 @@ A data frame with X rows and Y variables:
 posmood
 }
 \description{
-A dataset about positive mood... (describe it briefly).
+An intensive longitudinal dataset from an EMA study that examines the effect of
+various covariates on positive mood variation in adolescents.
+}
+\details{
+516 participants with a total of 17574 observations are collected.
+}
+\references{
+Mermelstein, R., Hedeker, D., and Weinstein, S. (2010). Ecological momentary assessment of mood-smoking relationships in adolescent smokers. American Psychological Association
 }
 \keyword{datasets}

@@ -2,15 +2,35 @@
 % Please edit documentation in R/melsvmp.R
 \name{summary.mels_vmp}
 \alias{summary.mels_vmp}
-\title{Summary method for mels_vmp objects}
+\title{Summarize a mels_vmp Model Fit}
 \usage{
 \method{summary}{mels_vmp}(object, ...)
 }
 \arguments{
-\item{object}{An object of class 'mels_vmp'.}
+\item{object}{An object of class \code{mels_vmp}.}
 
-\item{...}{Additional arguments}
+\item{...}{Additional arguments (currently unused).}
+}
+\value{
+Invisibly returns the original \code{mels_vmp} object.
 }
 \description{
-Provides a summary of the fitted model with robust sandwich errors.
+Prints a formatted summary of a fitted Mixed-Effects Location Scale model,
+including parameter estimates, robust sandwich standard errors, z-values,
+and p-values.
+}
+\details{
+The summary is organized into sections:
+\itemize{
+\item \strong{Mean Model Parameters (beta):} Estimates for the fixed effects in the mean model.
+\item \strong{Between-Subject Variance Parameters (alpha):} Estimates for the fixed effects in the between-subject variance model.
+\item \strong{Within-Subject Variance Parameters (tau):} Estimates for the fixed effects in the within-subject variance model.
+\item \strong{Random Effect Standard Deviation (omega):} Estimate for the random effect standard deviation.
+\item \strong{Convergence Details:} Number of iterations and total runtime.
+}
+All standard errors and confidence intervals are based on the robust
+sandwich estimator.
+}
+\seealso{
+\code{\link{mels_vmp}}
 }

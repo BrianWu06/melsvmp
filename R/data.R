@@ -1,6 +1,13 @@
 #' Riesby Data Set
-#' ...
-#' @format A data frame with X rows and 6 variables:
+#' 
+#' 
+#' A longitudinal dataset that examined the Hamilton depression plasma scores and 
+#' clinical response
+#' 
+#' 66 depressed inpatients (37 endogenous and 29 non-endogenous) with 396 total 
+#' observations. 
+#' 
+#' @format A data frame with 396 rows and 6 variables:
 #' \describe{
 #'   \item{id}{Subject ID}
 #'   \item{hamd}{Hamilton depression score}
@@ -9,13 +16,17 @@
 #'   \item{endog}{Endogenous depression status}
 #'   \item{endweek}{Interaction of endog and week}
 #' }
+#' @references Reisby, Niels, et al. "Imipramine: clinical effects and pharmacokinetic variability." Psychopharmacology 54.3 (1977): 263-272.
 "riesby"
 
 #' Positive Mood Data Set
 #'
-#' A dataset about positive mood... (describe it briefly).
+#' An intensive longitudinal dataset from an EMA study that examines the effect of 
+#' various covariates on positive mood variation in adolescents.
+#' 
+#' 516 participants with a total of 17574 observations are collected.
 #'
-#' @format A data frame with X rows and Y variables:
+#' @format A data frame with 17574 rows and 19 variables:
 #' \describe{
 #'   \item{id}{Subject ID}
 #'   \item{posmood}{Positive mood score}
@@ -37,4 +48,6 @@
 #'   \item{tirbor}{prompt-level assessments of tired/bored}
 #'   \item{frustr}{prompt-level assessments of frustrated/stressed}
 #' }
+#' 
+#' @references Mermelstein, R., Hedeker, D., and Weinstein, S. (2010). Ecological momentary assessment of mood-smoking relationships in adolescent smokers. American Psychological Association
 "posmood"

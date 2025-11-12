@@ -2,15 +2,33 @@
 % Please edit documentation in R/melsvmp.R
 \name{summary.mels_vmp_bootstrap}
 \alias{summary.mels_vmp_bootstrap}
-\title{Summary method for mels_vmp_bootstrap objects}
+\title{Summarize a mels_vmp Bootstrap}
 \usage{
 \method{summary}{mels_vmp_bootstrap}(object, ...)
 }
 \arguments{
-\item{object}{An object of class 'mels_vmp_bootstrap'.}
+\item{object}{An object of class \code{mels_vmp_bootstrap}.}
 
 \item{...}{Additional arguments (currently unused).}
 }
+\value{
+Invisibly returns the original \code{mels_vmp_bootstrap} object.
+}
 \description{
-Provides a summary of the bootstrap results.
+Prints a formatted summary of the non-parametric bootstrap results,
+including the original estimates, bootstrap standard errors, and
+95\% percentile confidence intervals.
+}
+\details{
+The summary is printed to the console and organized into sections:
+\itemize{
+\item Header: Reports the number of successful replicates and total runtime.
+\item Mean Model Parameters (beta): Estimates, Bootstrap SE, and CIs.
+\item Between-Subject Variance Parameters (alpha): Estimates, Bootstrap SE, and CIs.
+\item Within-Subject Variance Parameters (tau): Estimates, Bootstrap SE, and CIs.
+\item Random Effect Standard Deviation (omega): Estimates, Bootstrap SE, and CIs.
+}
+}
+\seealso{
+\code{\link{bootstrap_mels_vmp}}
 }
