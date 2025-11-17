@@ -13,10 +13,10 @@ is defined as:
 
 ``` math
 \begin{aligned}
-y_{ij} &= x_{ij}^\top \beta + \nu_i + \varepsilon_{ij} \\
-\nu_i &\sim \mathcal{N}(0, \exp{(U_i^\top \alpha)}) \\
-\varepsilon_{ij} &\sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)}) \\
-\omega_i &\sim \mathcal{N}(0, \sigma_\omega^2)
+y_{ij}&= x_{ij}^\top \beta + \nu_i + \varepsilon_{ij} \\
+\nu_i&\sim \mathcal{N}(0, \exp{(U_i^\top \alpha)}) \\
+\varepsilon_{ij}&\sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)}) \\
+\omega_i&\sim \mathcal{N}(0, \sigma_\omega^2)
 \end{aligned}
 ```
 
