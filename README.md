@@ -21,7 +21,7 @@ y_{ij}&= x_{ij}^\top \beta + \nu_i + \varepsilon_{ij} \\
 ```
 
 For more information, please refer to Hedeker and Nordgren (2013). Note
-that our model formulation is a restricted to only allow for non
+that our model formulation is currently restricted to only allow for non
 time-varying covariates for $\alpha$ and without the effect of $\nu_i$
 on $\omega_i$.
 
