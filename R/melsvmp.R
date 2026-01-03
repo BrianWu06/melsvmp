@@ -241,30 +241,24 @@ san_est <- function(X_matrix, y_vector, u_matrix, w_matrix, ids, unique_ids, id_
                     mu_omega_q, Sigma_omega_q, mu_inv_sigma_omega_q,
                     beta_prior, alpha_prior, tau_prior) {
   
-  # Get parameter dimensions
   p_beta <- ncol(X_matrix)
   p_alpha <- ncol(u_matrix)
   p_tau <- ncol(w_matrix)
   p_total <- p_beta + p_alpha + p_tau
   num_ids <- length(unique_ids)
   
-  # Initialize the Bread (A) and Meat (B) matrices
   A_hat <- matrix(0, p_total, p_total)
   B_hat <- matrix(0, p_total, p_total)
   
-  # Pre-calculate all converged psi expectations
   psi_i_alpha_all <- psi_alpha(u_matrix, mu_alpha_q, Sigma_alpha_q)
   psi_ij_tau_all <- psi_tau(w_matrix, mu_tau_q, Sigma_tau_q)
   psi_i_omega_all <- psi_omega(mu_omega_q, Sigma_omega_q)
   
-  # Loop over each subject (i) to build A_i and B_i
   for (i in 1:num_ids) {
     
-    # --- 1. Get subject-specific data and params ---
     idx_char <- as.character(unique_ids[i])
     cur_rows <- id_indices[[idx_char]]
     
-    # Skip subjects with no data (can happen in bootstrap)
     if (length(cur_rows) == 0) {
       next
     }
@@ -279,24 +273,17 @@ san_est <- function(X_matrix, y_vector, u_matrix, w_matrix, ids, unique_ids, id_
     mu_omegai <- mu_omega_q[i]
     Sigma_omegai <- Sigma_omega_q[i]
     
-    # --- 2. Calculate subject-specific expectations ---
     psi_alphai <- psi_i_alpha_all[i]
     psi_taui <- psi_ij_tau_all[cur_rows]
     psi_omegai <- psi_i_omega_all[i]
     
     Lambda_i <- psi_taui * psi_omegai
-    
-    # --- THIS IS THE FIX ---
-    # Force resid_i to be a vector, not an n_i x 1 matrix
     resid_i <- as.vector(yi - xi %*% mu_beta_q - mu_nui)
-    # --- END FIX ---
     
     H_i_terms <- resid_i^2 + rowSums((xi %*% Sigma_beta_q) * xi) + Sigma_nui
     nu_sq_i <- Sigma_nui + mu_nui^2
     E_inv_sigma_omega <- mu_inv_sigma_omega_q
     
-    # --- 3. Calculate G_i (Gradient) for the "Meat" ---
-    # (vector[n_i] * vector[n_i]) * matrix[n_i, p_beta] -> matrix[n_i, p_beta]
     G_beta_i <- colSums((Lambda_i * resid_i) * xi, na.rm = TRUE)
     G_alpha_i <- 0.5 * (psi_alphai * nu_sq_i - 1) * as.vector(ui)
     G_tau_i <- 0.5 * colSums((Lambda_i * H_i_terms - 1) * wi, na.rm = TRUE)
@@ -304,28 +291,22 @@ san_est <- function(X_matrix, y_vector, u_matrix, w_matrix, ids, unique_ids, id_
     G_i <- c(G_beta_i, G_alpha_i, G_tau_i)
     B_hat <- B_hat + G_i %*% t(G_i)
     
-    # --- 4. Calculate H_i (Adjusted Hessian) for the "Bread" ---
-    
-    # H_local: D^2 v_i w.r.t. psi_i (local params) [2x2]
     H_vv <- -sum(Lambda_i, na.rm = TRUE) - psi_alphai
     H_oo <- -0.5 * sum(Lambda_i * H_i_terms, na.rm = TRUE) - E_inv_sigma_omega
     H_vo <- -sum(Lambda_i * resid_i, na.rm = TRUE)
     H_local <- matrix(c(H_vv, H_vo, H_vo, H_oo), 2, 2)
     
-    # Check for singularity
     if (abs(det(H_local)) < 1e-10) {
-      next # Skip this subject if H_local is singular
+      next 
     }
     H_local_inv <- solve(H_local)
     
-    # H_global: D^2 v_i w.r.t. theta (global params) [p_total x p_total]
     H_bb <- -t(xi) %*% (Lambda_i * xi)
     H_aa <- -0.5 * psi_alphai * nu_sq_i * (t(ui) %*% ui)
     H_tt <- -0.5 * t(wi) %*% (Lambda_i * H_i_terms * wi)
-    H_bt <- -t(xi) %*% ((Lambda_i * resid_i) * wi) # (vector * matrix)
+    H_bt <- -t(xi) %*% ((Lambda_i * resid_i) * wi)
     H_tb <- t(H_bt)
     
-    # Zero blocks
     H_ba <- matrix(0, p_beta, p_alpha)
     H_ab <- matrix(0, p_alpha, p_beta)
     H_at <- matrix(0, p_alpha, p_tau)
@@ -335,7 +316,6 @@ san_est <- function(X_matrix, y_vector, u_matrix, w_matrix, ids, unique_ids, id_
                       cbind(H_ab, H_aa, H_at),
                       cbind(H_tb, H_ta, H_tt))
     
-    # H_cross: D^2 v_i w.r.t. theta and psi_i [p_total x 2]
     H_bv <- -colSums(Lambda_i * xi, na.rm = TRUE)
     H_bo <- -colSums((Lambda_i * resid_i) * xi, na.rm = TRUE)
     
@@ -349,24 +329,19 @@ san_est <- function(X_matrix, y_vector, u_matrix, w_matrix, ids, unique_ids, id_
                      cbind(H_av, H_ao),
                      cbind(H_tv, H_to))
     
-    # H_i = H_global - H_cross %*% solve(H_local) %*% t(H_cross)
     H_i <- H_global - H_cross %*% H_local_inv %*% t(H_cross)
     
     A_hat <- A_hat + H_i
   }
   
-  # --- 5. Add Priors to the Bread ---
   H_prior_beta <- diag(-1 / beta_prior, p_beta)
   H_prior_alpha <- diag(-1 / alpha_prior, p_alpha)
   H_prior_tau <- diag(-1 / tau_prior, p_tau)
   
-  # Use Matrix::bdiag to create a block-diagonal matrix
   H_prior <- as.matrix(Matrix::bdiag(H_prior_beta, H_prior_alpha, H_prior_tau))
   
   A_hat_final <- A_hat + H_prior
   
-  # --- 6. Assemble the Sandwich ---
-  # Use solve() with error handling
   A_hat_inv <- tryCatch(
     solve(A_hat_final),
     error = function(e) {
@@ -468,40 +443,30 @@ mels_vmp_fitter <- function(X_matrix, y_vector, w_matrix, u_matrix, ids, max_ite
     }
   }
   
-  # Call the new function with all converged parameters
   sand_cov_mat <- san_est(X_matrix, y_vector, u_matrix, w_matrix, ids, unique_ids, id_indices,
                           mu_beta_q, Sigma_beta_q, mu_nu_i_q, Sigma_nu_i_q,
                           mu_alpha_q, Sigma_alpha_q, mu_tau_q, Sigma_tau_q,
                           mu_omega_q, Sigma_omega_q, mu_inv_sigma_omega_q,
-                          beta_prior, alpha_prior, tau_prior) # <--- ADDED
+                          beta_prior, alpha_prior, tau_prior)
   
-  # Partition the full sandwich matrix into blocks
   p_total <- p_beta + p_alpha + p_tau
-  beta_sand_cov <- sand_cov_mat[1:p_beta, 1:p_beta, drop = FALSE] # <--- ADDED
-  alpha_sand_cov <- sand_cov_mat[(p_beta + 1):(p_beta + p_alpha), (p_beta + 1):(p_beta + p_alpha), drop = FALSE] # <--- ADDED
-  tau_sand_cov <- sand_cov_mat[(p_beta + p_alpha + 1):p_total, (p_beta + p_alpha + 1):p_total, drop = FALSE] # <--- ADDED
+  beta_sand_cov <- sand_cov_mat[1:p_beta, 1:p_beta, drop = FALSE]
+  alpha_sand_cov <- sand_cov_mat[(p_beta + 1):(p_beta + p_alpha), (p_beta + 1):(p_beta + p_alpha), drop = FALSE]
+  tau_sand_cov <- sand_cov_mat[(p_beta + p_alpha + 1):p_total, (p_beta + p_alpha + 1):p_total, drop = FALSE]
   
   sigma_omega_rate <- mu_inv_a_omega_q + 0.5 * sum(Sigma_omega_q + mu_omega_q^2)
   sigma_omega_A <- (num_ids + 1) / 2
   sigma_omega_mean <- sigma_omega_rate / ((num_ids + 1) / 2 - 1)
-  if (sigma_omega_A > 2) {
-    var_sigma_omega_sq <- sigma_omega_rate^2 / ((sigma_omega_A - 1)^2 * (sigma_omega_A - 2))
-    # Apply Delta Method: Var(sqrt(X)) approx = Var(X) / (4 * E[X])
-    var_sigma_omega_approx <- var_sigma_omega_sq / (4 * sigma_omega_mean)
-    se_sigma_omega_approx <- sqrt(var_sigma_omega_approx)
-  } else {
-    se_sigma_omega_approx <- NA # Variance is undefined
-  }
   
   rownames(beta_new$mu_beta_new) <- colnames(X_matrix)
   rownames(alpha_new$mu_alpha_new) <- colnames(u_matrix)
   names(tau_new$mu_tau_new) <- colnames(w_matrix)
   
   results <- list(
-    beta = list(params = mu_beta_q, cov_mat = beta_sand_cov, vmp_cov_mat = Sigma_beta_q), # <--- CHANGED
-    alpha = list(params = mu_alpha_q, cov_mat = alpha_sand_cov, vmp_cov_mat = Sigma_alpha_q), # <--- CHANGED
-    tau = list(params = mu_tau_q, cov_mat = tau_sand_cov, vmp_cov_mat = Sigma_tau_q), # <--- CHANGED
-    omega = list(std_dev = sqrt(sigma_omega_mean), approx_se = se_sigma_omega_approx), 
+    beta = list(params = mu_beta_q, cov_mat = beta_sand_cov, vmp_cov_mat = Sigma_beta_q), 
+    alpha = list(params = mu_alpha_q, cov_mat = alpha_sand_cov, vmp_cov_mat = Sigma_alpha_q),
+    tau = list(params = mu_tau_q, cov_mat = tau_sand_cov, vmp_cov_mat = Sigma_tau_q), 
+    omega = list(std_dev = sqrt(sigma_omega_mean)), 
     r = NULL,
     elbo_history = elbo_history, 
     iterations = i
@@ -660,27 +625,16 @@ summary.mels_vmp <- function(object, ...){
   
   cat("\n")
   cat("--- Random Effect Standard Deviation (omega) ---\n")
-  omega_est <- object$omega$std_dev
-  omega_se <- object$omega$approx_se
   
-  # Calculate CI, but ensure it's not negative (since std dev > 0)
-  omega_ci_lower <- pmax(0, omega_est - 1.96 * omega_se) 
-  omega_ci_upper <- omega_est + 1.96 * omega_se
+  omega_est <- object$omega$std_dev
   
   omega_df <- data.frame(
     Estimate = omega_est,
-    'Approx. SE' = omega_se, # Labelled as Approx. SE (Delta Method)
-    'CI.Lower' = omega_ci_lower,
-    'CI.Upper' = omega_ci_upper,
     check.names = FALSE
   )
+
   rownames(omega_df) <- "omega_std_dev"
   print(round(omega_df, 4))
-  
-  cat("-------------------------------------------------------\n")
-  cat("Convergence Details:\n")
-  cat(paste0("  Algorithm converged in ", object$iterations, " iterations.\n"))
-  cat(paste0("  Total Runtime: ", object$runtime, " \n"))
   
   invisible(object)
 }

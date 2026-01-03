@@ -13,15 +13,15 @@ is defined as:
 
 ``` math
 \begin{aligned}
-y_{ij}&= x_{ij}^\top \beta + \nu_i + \varepsilon_{ij} \\
-\nu_i&\sim \mathcal{N}(0, \exp{(U_i^\top \alpha)}) \\
-\varepsilon_{ij}&\sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)}) \\
-\omega_i&\sim \mathcal{N}(0, \sigma_\omega^2)
+y_{ij} &= x_{ij}^\top \beta + \nu_i + \varepsilon_{ij} \\
+\nu_i &\sim \mathcal{N}(0, \exp{(U_i^\top \alpha)}) \\
+\varepsilon_{ij} &\sim \mathcal{N}(0, \exp{(W_{ij}^\top \tau + \omega_i)}) \\
+\omega_i &\sim \mathcal{N}(0, \sigma_\omega^2)
 \end{aligned}
 ```
 
 For more information, please refer to Hedeker and Nordgren (2013). Note
-that our model formulation is currently restricted to only allow for non
+that our model formulation is a restricted to only allow for non
 time-varying covariates for $\alpha$ and without the effect of $\nu_i$
 on $\omega_i$.
 
@@ -57,15 +57,14 @@ You can install the development version of melsvmp like so:
 ## Example
 
 This is a basic example showing how to use the function mels_vmp to fit
-a MELS model by an example. We use a simple longitudinal dataset
-“riesby” to illustrate the usage, you can import and view the
-description of this dataset by
+a MELS model. We use a simple longitudinal dataset “riesby” to
+illustrate the usage, you can import and view the description of this
+dataset by
 
 ``` r
 library(melsvmp)
 
 data(riesby)
-
 ?riesby
 ```
 
@@ -104,12 +103,8 @@ summary(riesby_vmp)
 #> endog         0.2928    0.2223  -0.1429   0.7286  1.3171  0.1878
 #> 
 #> --- Random Effect Standard Deviation (omega) ---
-#>               Estimate Approx. SE CI.Lower CI.Upper
-#> omega_std_dev   0.6101     0.0544   0.5036   0.7166
-#> -------------------------------------------------------
-#> Convergence Details:
-#>   Algorithm converged in 55 iterations.
-#>   Total Runtime: 0.4 secs
+#>               Estimate
+#> omega_std_dev   0.6101
 ```
 
 For performing percentile bootstrap, you can use the following code, we
@@ -134,29 +129,29 @@ summary(riesby_vmp_boot)
 #> ## Bootstrap Summary for MELS Model ##
 #> --------------------------------------
 #> Successful replicates: 1000
-#> Total runtime: 3.47 mins
+#> Total runtime: 3.66 mins
 #> 
 #> --- Mean Model Parameters (beta) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)  22.2573  0.6638  20.9902  23.6405
-#> week         -2.2673  0.3164  -2.9014  -1.6663
-#> endog         1.8679  1.0288  -0.1943   3.8257
-#> endweek      -0.0139  0.4268  -0.8583   0.8545
+#> (Intercept)  22.2573  0.6880  20.9833  23.6750
+#> week         -2.2673  0.3152  -2.9334  -1.7159
+#> endog         1.8679  1.0279  -0.1612   3.8264
+#> endweek      -0.0139  0.4372  -0.8265   0.8635
 #> 
 #> --- Between-Subject Variance Parameters (alpha) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.2777  0.5373   1.2321   2.7799
-#> endog         0.4937  0.5863  -0.2390   1.5850
+#> (Intercept)   2.2777  0.3797   1.2859   2.7716
+#> endog         0.4937  0.4500  -0.2235   1.4910
 #> 
 #> --- Within-Subject Variance Parameters (tau) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.1381  0.2425   1.5929   2.5428
-#> week          0.1841  0.0612   0.0643   0.3087
-#> endog         0.2928  0.2534  -0.1637   0.7974
+#> (Intercept)   2.1381  0.2500   1.5940   2.5970
+#> week          0.1841  0.0601   0.0675   0.3094
+#> endog         0.2928  0.2513  -0.2090   0.7706
 #> 
 #> --- Random Effect Standard Deviation (omega) ---
 #>               Estimate Boot.SE CI.Lower CI.Upper
-#> omega_std_dev   0.6101  0.1377   0.3441   0.8749
+#> omega_std_dev   0.6101  0.1318   0.3583   0.8534
 #> --------------------------------------
 ```
 
