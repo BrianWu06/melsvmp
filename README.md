@@ -57,54 +57,71 @@ You can install the development version of melsvmp like so:
 ## Example
 
 This is a basic example showing how to use the function mels_vmp to fit
-a MELS model. We use a simple longitudinal dataset “riesby” to
-illustrate the usage, you can import and view the description of this
-dataset by
+a MELS model. We use an EMA dataset “posmood” to illustrate the usage,
+you can import and view the description of this dataset by
 
 ``` r
 library(melsvmp)
 
-data(riesby)
-?riesby
+data("posmood")
 ```
 
 The following code shows how to fit a MELS model with our vmp algorithm
-on the riesby dataset. The standard errors and confidence intervals are
+on the posmood dataset. The standard errors and confidence intervals are
 estimated by the sandwich estimators proposed by Westling and McCormick
 (2019).
 
 ``` r
-riesby_vmp <- mels_vmp(y = "hamd", 
-                       beta_formula = ~ week + endog + endweek, 
-                       alpha_formula = ~ endog, 
-                       tau_formula = ~ week + endog, 
-                       id = "id",
-                       data = riesby)
-#> CAVI converges at iteration  55
-summary(riesby_vmp)
+posmood_vmp <- mels_vmp(y = "posmood", 
+                            beta_formula = ~ other_bs + other_ws + genderf + t1 + t2 +
+                              t3 + t4 + w1 + w2 + w3 + w4 + w5 + w6 + tirbor + frustr, 
+                            alpha_formula = ~ other_bs + genderf + age15, 
+                            tau_formula = ~ other_bs + other_ws + genderf + age15 + tirbor + frustr, 
+                            id = "id", 
+                            data = posmood)
+#> CAVI converges at iteration  18
+summary(posmood_vmp)
 #> ## VMP for MELS (with Robust Sandwich Errors) ##
 #> --------------------------------------------------------
 #> --- Mean Model Parameters (beta) ---
-#>             Estimate Robust SE CI.Lower CI.Upper z value p-value
-#> (Intercept)  22.2573    0.6428  20.9974  23.5173 34.6241  0.0000
-#> week         -2.2673    0.2855  -2.8269  -1.7077 -7.9410  0.0000
-#> endog         1.8679    1.0036  -0.0992   3.8350  1.8612  0.0627
-#> endweek      -0.0139    0.4097  -0.8169   0.7891 -0.0339  0.9729
+#>             Estimate Robust SE CI.Lower CI.Upper  z value p-value
+#> (Intercept)   8.1434    0.2664   7.6212   8.6655  30.5674  0.0000
+#> other_bs      0.4616    0.3262  -0.1777   1.1010   1.4152  0.1570
+#> other_ws      0.1911    0.0288   0.1347   0.2475   6.6455  0.0000
+#> genderf      -0.0291    0.0944  -0.2142   0.1560  -0.3083  0.7578
+#> t1            0.2472    0.0381   0.1726   0.3217   6.4944  0.0000
+#> t2            0.3550    0.0427   0.2714   0.4387   8.3220  0.0000
+#> t3            0.3841    0.0410   0.3038   0.4644   9.3738  0.0000
+#> t4            0.2998    0.0590   0.1842   0.4155   5.0817  0.0000
+#> w1            0.1403    0.0460   0.0501   0.2304   3.0481  0.0023
+#> w2            0.1686    0.0519   0.0668   0.2704   3.2470  0.0012
+#> w3            0.1278    0.0527   0.0246   0.2311   2.4271  0.0152
+#> w4            0.0821    0.0476  -0.0112   0.1754   1.7253  0.0845
+#> w5            0.0502    0.0429  -0.0340   0.1343   1.1685  0.2426
+#> w6           -0.0219    0.0406  -0.1014   0.0576  -0.5395  0.5896
+#> tirbor       -0.1457    0.0081  -0.1615  -0.1298 -18.0511  0.0000
+#> frustr       -0.3262    0.0093  -0.3443  -0.3080 -35.1695  0.0000
 #> 
 #> --- Between-Subject Variance Parameters (alpha) ---
 #>             Estimate Robust SE CI.Lower CI.Upper z value p-value
-#> (Intercept)   2.2777    0.3218   1.6469   2.9084  7.0775   0.000
-#> endog         0.4937    0.3759  -0.2430   1.2304  1.3136   0.189
+#> (Intercept)  -0.1878    0.3498  -0.8733   0.4978 -0.5369  0.5914
+#> other_bs      0.3324    0.4775  -0.6036   1.2683  0.6960  0.4864
+#> genderf       0.0926    0.1456  -0.1928   0.3780  0.6360  0.5248
+#> age15        -0.1040    0.0652  -0.2318   0.0238 -1.5950  0.1107
 #> 
 #> --- Within-Subject Variance Parameters (tau) ---
 #>             Estimate Robust SE CI.Lower CI.Upper z value p-value
-#> (Intercept)   2.1381    0.2046   1.7372   2.5391 10.4523  0.0000
-#> week          0.1841    0.0549   0.0765   0.2918  3.3513  0.0008
-#> endog         0.2928    0.2223  -0.1429   0.7286  1.3171  0.1878
+#> (Intercept)   0.1931    0.1709  -0.1419   0.5281  1.1298  0.2586
+#> other_bs     -0.3058    0.2074  -0.7124   0.1007 -1.4744  0.1404
+#> other_ws     -0.0921    0.0347  -0.1600  -0.0241 -2.6563  0.0079
+#> genderf       0.1680    0.0575   0.0553   0.2808  2.9205  0.0035
+#> age15        -0.0850    0.0259  -0.1358  -0.0343 -3.2845  0.0010
+#> tirbor       -0.0042    0.0079  -0.0197   0.0113 -0.5346  0.5929
+#> frustr        0.1300    0.0078   0.1147   0.1452 16.7232  0.0000
 #> 
 #> --- Random Effect Standard Deviation (omega) ---
 #>               Estimate
-#> omega_std_dev   0.6101
+#> omega_std_dev   0.5882
 ```
 
 For performing percentile bootstrap, you can use the following code, we
@@ -112,8 +129,8 @@ support both parallel and sequential computing. This can give a more
 robust confidence interval.
 
 ``` r
-# riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, cores = 10)
-riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, parallel = FALSE)
+# posmood_vmp_boot <- bootstrap_mels_vmp(posmood_vmp, B = 1000, cores = 10)
+posmood_vmp_boot <- bootstrap_mels_vmp(posmood_vmp, B = 1000, parallel = FALSE)
 #> Starting SEQUENTIAL bootstrap with 1000 replicates...
 #>   Running replicate: 100 of 1000
 #>   Running replicate: 200 of 1000
@@ -125,33 +142,51 @@ riesby_vmp_boot <- bootstrap_mels_vmp(riesby_vmp, B = 1000, parallel = FALSE)
 #>   Running replicate: 800 of 1000
 #>   Running replicate: 900 of 1000
 #>   Running replicate: 1000 of 1000
-summary(riesby_vmp_boot)
+summary(posmood_vmp_boot)
 #> ## Bootstrap Summary for MELS Model ##
 #> --------------------------------------
 #> Successful replicates: 1000
-#> Total runtime: 3.66 mins
+#> Total runtime: 1.15 hours
 #> 
 #> --- Mean Model Parameters (beta) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)  22.2573  0.6880  20.9833  23.6750
-#> week         -2.2673  0.3152  -2.9334  -1.7159
-#> endog         1.8679  1.0279  -0.1612   3.8264
-#> endweek      -0.0139  0.4372  -0.8265   0.8635
+#> (Intercept)   8.1434  0.2663   7.5945   8.6468
+#> other_bs      0.4616  0.3285  -0.1582   1.1190
+#> other_ws      0.1911  0.0299   0.1329   0.2496
+#> genderf      -0.0291  0.0914  -0.2073   0.1527
+#> t1            0.2472  0.0381   0.1774   0.3264
+#> t2            0.3550  0.0433   0.2763   0.4448
+#> t3            0.3841  0.0408   0.3097   0.4659
+#> t4            0.2998  0.0594   0.1922   0.4211
+#> w1            0.1403  0.0478   0.0511   0.2360
+#> w2            0.1686  0.0516   0.0727   0.2695
+#> w3            0.1278  0.0534   0.0260   0.2419
+#> w4            0.0821  0.0485  -0.0110   0.1756
+#> w5            0.0502  0.0426  -0.0309   0.1333
+#> w6           -0.0219  0.0404  -0.0969   0.0568
+#> tirbor       -0.1457  0.0082  -0.1606  -0.1289
+#> frustr       -0.3262  0.0095  -0.3450  -0.3083
 #> 
 #> --- Between-Subject Variance Parameters (alpha) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.2777  0.3797   1.2859   2.7716
-#> endog         0.4937  0.4500  -0.2235   1.4910
+#> (Intercept)  -0.1878  0.3791  -1.0010   0.5178
+#> other_bs      0.3324  0.5205  -0.6398   1.4259
+#> genderf       0.0926  0.1452  -0.1985   0.3754
+#> age15        -0.1040  0.0688  -0.2364   0.0294
 #> 
 #> --- Within-Subject Variance Parameters (tau) ---
 #>             Estimate Boot.SE CI.Lower CI.Upper
-#> (Intercept)   2.1381  0.2500   1.5940   2.5970
-#> week          0.1841  0.0601   0.0675   0.3094
-#> endog         0.2928  0.2513  -0.2090   0.7706
+#> (Intercept)   0.1931  0.1748  -0.1342   0.5364
+#> other_bs     -0.3058  0.2120  -0.6913   0.1331
+#> other_ws     -0.0921  0.0363  -0.1621  -0.0219
+#> genderf       0.1680  0.0566   0.0617   0.2859
+#> age15        -0.0850  0.0264  -0.1339  -0.0308
+#> tirbor       -0.0042  0.0082  -0.0208   0.0126
+#> frustr        0.1300  0.0078   0.1154   0.1452
 #> 
 #> --- Random Effect Standard Deviation (omega) ---
 #>               Estimate Boot.SE CI.Lower CI.Upper
-#> omega_std_dev   0.6101  0.1318   0.3583   0.8534
+#> omega_std_dev   0.5882   0.023    0.539   0.6283
 #> --------------------------------------
 ```
 
